@@ -22,7 +22,7 @@ function Register() {
             <input type="text" />
           </Form.Item>
           <Form.Item label="Password" name='password'>
-            <input type="text" />
+            <input type="password" />
           </Form.Item>
 
           <div className="d-flex justify-content-between align-items-center">
