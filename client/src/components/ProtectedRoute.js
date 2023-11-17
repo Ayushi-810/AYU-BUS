@@ -4,11 +4,12 @@ import { message } from "antd";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { SetUser } from "../redux/usersSlice";
-import { HideLoading, ShowLoading } from '../redux/alertsSlice';
+import { HideLoading, ShowLoading } from "../redux/alertsSlice";
+import DefaultLayout from "./DefaultLayout";
 
 function ProtectedRoute({ children }) {
-  const dispatch=useDispatch();
-  const {loading }=useSelector((state)=>state.alerts);
+  const dispatch = useDispatch();
+  const { loading } = useSelector((state) => state.alerts);
   const navigate = useNavigate();
   const validateToken = async () => {
     try {
@@ -18,27 +19,24 @@ function ProtectedRoute({ children }) {
         {},
         {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
         }
       );
       if (response.data.success) {
-      //  setLoading(false);
-      dispatch(HideLoading());
+        //  setLoading(false);
+        dispatch(HideLoading());
         dispatch(SetUser(response.data.data));
       } else {
-      
         localStorage.removeItem("token");
         message.error(response.data.message);
         navigate("/login");
-
       }
     } catch (error) {
       dispatch(HideLoading());
       localStorage.removeItem("token");
       message.error(error.message);
-      
-     
+
       navigate("/login");
     }
   };
@@ -51,7 +49,7 @@ function ProtectedRoute({ children }) {
     }
   }, []);
 
-  return <div>{loading ? <div> Loading...</div> : <>{children}</>} </div>;
+  return <div>{!loading && <DefaultLayout>{children}</DefaultLayout>} </div>;
 }
 
 export default ProtectedRoute;
