@@ -75,6 +75,16 @@ a{
 
 }
 
+i{
+    cursor: pointer;
+    font-size: 25px;
+}
+
+h1{
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+}
+
 /* spinner/loader */
 
 .spinner-parent{
