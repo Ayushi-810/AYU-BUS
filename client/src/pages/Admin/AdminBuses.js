@@ -11,7 +11,7 @@ function AdminBuses() {
   const dispatch = useDispatch();
   const [showBusForm, setShowBusForm] = React.useState(false);
   const [buses, setBuses] = useState([]);
-  const [selectedBus,setSelectedBus]=useState(null);
+  const [selectedBus, setSelectedBus] = useState(null);
 
   const getBuses = async () => {
     try {
@@ -20,6 +20,25 @@ function AdminBuses() {
       dispatch(HideLoading());
       if (response.data.success) {
         setBuses(response.data.data);
+      } else {
+        message.error(response.data.message);
+      }
+    } catch (error) {
+      dispatch(HideLoading());
+      message.error(error.message);
+    }
+  };
+
+  const deleteBus = async (id) => {
+    try {
+      dispatch(ShowLoading());
+      const response = await axiosInstance.post("/api/buses/delete-bus", {
+        _id: id,
+      });
+      dispatch(HideLoading());
+      if (response.data.success) {
+        message.success(response.data.message);
+        getBuses();
       } else {
         message.error(response.data.message);
       }
@@ -49,7 +68,6 @@ function AdminBuses() {
     {
       title: "Journey Date",
       dataIndex: "journeyDate",
-      
     },
     {
       title: "Status",
@@ -58,16 +76,23 @@ function AdminBuses() {
     {
       title: "Action",
       dataIndex: "action",
-      render:(action,record)=>(
+      render: (action, record) => (
         <div className="d-flex gap-3">
-        <i class="ri-delete-bin-line"></i>
-          <i class="ri-pencil-line"  onClick={()=>{
-            setSelectedBus(record);
-            setShowBusForm(true);
-          }}></i>
-          
+          <i
+            class="ri-delete-bin-line"
+            onClick={() => {
+              deleteBus(record._id);
+            }}
+          ></i>
+          <i
+            class="ri-pencil-line"
+            onClick={() => {
+              setSelectedBus(record);
+              setShowBusForm(true);
+            }}
+          ></i>
         </div>
-      )
+      ),
     },
   ];
 
@@ -84,16 +109,13 @@ function AdminBuses() {
         </button>
       </div>
 
-     <Table
-     columns={columns}
-     dataSource={buses}
-     />
+      <Table columns={columns} dataSource={buses} />
 
       {showBusForm && (
         <BusForm
           showBusForm={showBusForm}
           setShowBusForm={setShowBusForm}
-          type={selectedBus?"edit":"add"}
+          type={selectedBus ? "edit" : "add"}
           selectedBus={selectedBus}
           setSelectedBus={setSelectedBus}
           getData={getBuses}
