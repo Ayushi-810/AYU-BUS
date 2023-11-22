@@ -18,10 +18,15 @@ input{
 }
 
 /*card*/
+.underline{
+    text-decoration: underline;
+    cursor: pointer;
+}
 
 .card{
     border:2px solid gray;
     box-shadow: 0 0 2px gray;
+    border-radius: 0 !important;
 }
 
 /*text-sizes*/
@@ -80,7 +85,7 @@ i{
     font-size: 25px;
 }
 
-h1{
+h1,p{
     margin-bottom: 0 !important;
     padding-bottom: 0 !important;
 }
