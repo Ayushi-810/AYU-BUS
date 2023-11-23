@@ -4,7 +4,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { HideLoading, ShowLoading } from "../redux/alertsSlice";
 import { axiosInstance } from "../helpers/axiosInstance";
 import { useParams } from "react-router-dom";
+import SeatSelection from "../components/SeatSelection";
 function BookNow() {
+  const [selectedSeats, setSelectedSeats] = useState([]); //object created
   const params = useParams();
   const dispatch = useDispatch();
   const [bus, setBus] = useState(null);
@@ -33,7 +35,7 @@ function BookNow() {
   return (
     <div>
       {bus && (
-        <Row className="mt-3">
+        <Row className="mt-3" gutter={20}>
           <Col lg={12} xs={24} sm={24}>
             <h1 className="text-2xl text-secondary">
             {bus.name}
@@ -43,14 +45,29 @@ function BookNow() {
             </h1>
             <hr />
 
-            <div>
+            <div className="flex flex-col gap-1">
                 <h1 className="text-lg"> <b>Journey Date</b> : {bus.journeyDate} </h1>
                 <h1 className="text-lg"> <b>Fare</b> :${bus.fare} /-</h1>
                 <h1 className="text-lg"> <b>Departure Time</b> : {bus.departure} </h1>
                 <h1 className="text-lg"> <b>Arrival Time</b> : {bus.arrival} </h1>
             </div>
+            <hr/>
+            <div className="flex flex-col gap-2">
+            <h1 className="text-2xl">
+                <b>Selected Seats</b> :{selectedSeats.join(",")}
+            </h1>
+            <h1 className="text-2xl mt-2">Fare :<b>$ {bus.fare* selectedSeats.length} /- </b></h1>
+            <button className="secondary-btn mt-3">Book Now</button>
+            </div>
+
           </Col>
-          <Col lg={12} xs={24} sm={24}></Col>
+          <Col lg={12} xs={24} sm={24}>
+            <SeatSelection
+              selectedSeats={selectedSeats}
+              setSelectedSeats={setSelectedSeats}
+              bus={bus}
+            />
+          </Col>
         </Row>
       )}
     </div>
