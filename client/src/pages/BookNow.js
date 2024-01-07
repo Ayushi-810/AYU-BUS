@@ -3,12 +3,13 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { HideLoading, ShowLoading } from "../redux/alertsSlice";
 import { axiosInstance } from "../helpers/axiosInstance";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import SeatSelection from "../components/SeatSelection";
 import StripeCheckout from "react-stripe-checkout";
 function BookNow() {
   const [selectedSeats, setSelectedSeats] = useState([]); //object created
   const params = useParams();
+  const navigate=useNavigate();
   const dispatch = useDispatch();
   const [bus, setBus] = useState(null);
   const getBus = async () => {
@@ -29,16 +30,18 @@ function BookNow() {
     }
   };
 
-  const bookNow = async () => {
+  const bookNow = async (transactionId) => {
     try {
       dispatch(ShowLoading());
       const response = await axiosInstance.post("/api/bookings/book-seat", {
         bus: bus._id,
         seats: selectedSeats,
+       transactionId
       });
       dispatch(HideLoading());
       if (response.data.success) {
         message.success(response.data.message);
+        navigate("/bookings");
       } else {
         message.error(response.data.message);
       }
@@ -48,8 +51,27 @@ function BookNow() {
     }
   };
 
-  const onToken=(token)=>{
-    console.log(token)
+  const onToken= async(token)=>{
+  try{
+    dispatch(ShowLoading());
+    const response=await axiosInstance.post("/api/bookings/make-payment",{
+      token,
+      amount:selectedSeats.length*bus.fare *100,
+
+    });
+    dispatch(HideLoading());
+    if(response.data.success){
+      message.success(response.data.message);
+      bookNow(response.data.data.transactionId);
+    }
+    else{
+      message.error(response.data.message);
+    }
+
+  } catch(error){
+    dispatch(HideLoading());
+    message.error(error.message);
+  }
   }
 
   useEffect(() => {
@@ -59,56 +81,59 @@ function BookNow() {
   return (
     <div>
       {bus && (
-        <Row className="mt-3" gutter={20}>
+        <Row className="mt-3" gutter={[30,30]}>
           <Col lg={12} xs={24} sm={24}>
-            <h1 className="text-2xl text-secondary">{bus.name}</h1>
+            <h1 className="text-2xl primary-text">{bus.name}</h1>
             <h1 className="text-md">
               {bus.from}-{bus.to}{" "}
             </h1>
             <hr />
 
-            <div className="flex flex-col gap-1">
-              <h1 className="text-lg">
+            <div className="flex flex-col gap-2">
+              <p className="text-md">
                 {" "}
-                <b>Journey Date</b> : {bus.journeyDate}{" "}
-              </h1>
-              <h1 className="text-lg">
+                Journey Date : {bus.journeyDate}{" "}
+              </p>
+              <p className="text-md">
                 {" "}
-                <b>Fare</b> :${bus.fare} /-
-              </h1>
-              <h1 className="text-lg">
+                Fare : ₹ {bus.fare} /-
+              </p>
+              <p className="text-md">
                 {" "}
-                <b>Departure Time</b> : {bus.departure}{" "}
-              </h1>
-              <h1 className="text-lg">
+                Departure Time : {bus.departure}{" "}
+              </p>
+              <p className="text-md">
                 {" "}
-                <b>Arrival Time</b> : {bus.arrival}{" "}
-              </h1>
-              <h1 className="text-lg">
+                Arrival Time : {bus.arrival}{" "}
+              </p>
+              <p className="text-md">
                 {" "}
-                <b>Capacity</b> : {bus.capacity}{" "}
-              </h1>
-              <h1 className="text-lg">
+                Capacity : {bus.capacity}{" "}
+              </p>
+              <p className="text-md">
                 {" "}
-                <b>Seats Left</b> : {bus.capacity - bus.seatsBooked.length}{" "}
-              </h1>
+                Seats Left : {bus.capacity - bus.seatsBooked.length}{" "}
+              </p>
             </div>
             <hr />
             <div className="flex flex-col gap-2">
-              <h1 className="text-2xl">
-                Selected Seats : {selectedSeats.join(",")}
-              </h1>
-              <h1 className="text-2xl mt-2">
-                Fare : $ {bus.fare * selectedSeats.length} /-{" "}
-              </h1>
+              <p className="text-lg">
+                Selected Seats : {selectedSeats.join(", ")}
+              </p>
+              <p className="text-lg">
+                Fare : ₹ {bus.fare * selectedSeats.length} /-{" "}
+              </p>
               <hr />
 
               <StripeCheckout
+              billingAddress
                 token={onToken}
+                amount={bus.fare*selectedSeats.length*100}
+                currency="INR"
                 stripeKey="pk_test_51OFxHtSEV8Jywm5zP1nBDRDU9Wrh6rLT3X4nZjKIth7V38KKIwqjg1Mta0E5k9IpNW8Hh0mtaqlbn2FzPxyoeMWi00fWfKbe3t"
               >
                 <button
-                  className={`btn btn-primary ${
+                  className={`primary-btn ${
                     selectedSeats.length === 0 && "disabled-btn"
                   }`}
                   disabled={selectedSeats.length === 0}

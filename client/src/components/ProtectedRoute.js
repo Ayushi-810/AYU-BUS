@@ -30,6 +30,7 @@ function ProtectedRoute({ children }) {
         dispatch(HideLoading());
         dispatch(SetUser(response.data.data));
       } else {
+      
         localStorage.removeItem("token");
         message.error(response.data.message);
         navigate("/login");
@@ -37,6 +38,7 @@ function ProtectedRoute({ children }) {
     } catch (error) {
       dispatch(HideLoading());
       localStorage.removeItem("token");
+     
       message.error(error.message);
 
       navigate("/login");

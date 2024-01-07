@@ -11,10 +11,11 @@
     padding: 10px;
     border:1px solid gray;
     border-radius: 2px;
+    cursor: pointer;
 }
 
 .selected-seat{
-    background-color: green;
+    background-color: #192655;
     color: white;
 }
 

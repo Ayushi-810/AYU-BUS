@@ -87,17 +87,21 @@ function BusForm({
           </Col>
           <Col lg={8} xs={24}>
             <Form.Item label="Departure" name="departure">
-              <input type="text" />
+              <input type="time" />
             </Form.Item>
           </Col>
           <Col lg={8} xs={24}>
             <Form.Item label="Arrival" name="arrival">
-              <input type="text" />
+              <input type="time" />
             </Form.Item>
           </Col>
           <Col lg={12} xs={24}>
             <Form.Item label="Type" name="type">
-              <input type="text" />
+            <select name="" id="">
+            <option value="AC">AC</option>
+            <option value="Non-AC">Non-AC</option>
+            
+          </select>
             </Form.Item>
           </Col>
           <Col lg={12} xs={24}>
@@ -105,7 +109,19 @@ function BusForm({
               <input type="text" />
             </Form.Item>
           </Col>
+
+       <Col lg={12} xs={24}>
+        <Form.Item label='Status' name='status'>
+          <select name="" id="">
+            <option value="Yet to Start">Yet to Start</option>
+            <option value="Running">Running</option>
+            <option value="Completed">Completed</option>
+          </select>
+        </Form.Item>
+       </Col>
         </Row>
+
+
 
         <div className="d-flex justify-content-end">
           <button className="primary-btn" type="submit">
